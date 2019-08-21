@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html  lang="en-us" id="extr-page"
+       xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8"/>
+    <title> Login Post Message</title>
+    <meta name="description" content=""/>
+    <meta name="author" content=""/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+
+    <!-- #GOOGLE FONT -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:400italic,700italic,300,400,700"/>
+</head>
+
+<body class="animated fadeInDown">
+    <!-- MAIN CONTENT -->
+    <div id="content" class="container">
+        <div class="row">
+            </div>
+            <div class="col-xs-12 col-sm-12 col-md-5 col-lg-4">
+                <h1>Success post message</h1>
+                Credenciales:<br/>
+                - Usuario:<span id="Usuario"></span><br/>
+                - Clave:<span id="Clave"></span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script th:inline="javascript">
+    function receiveMessage(e){
+        if(e.origin!=="http://127.0.0.1:4200")
+            return;
+        //messageEle.innerHTML="Message Received: "+e.data;
+        var credenciales = e.data.split("|");
+        document.querySelector('#Usuario').textContent = credenciales[0];
+        document.querySelector('#Clave').textContent = credenciales[1];
+        /*setTimeout(() => {
+            document.getElementById('login-form').submit();
+        }, 100);*/
+    }
+    window.addEventListener('message', receiveMessage);
+</script>
+
+</body>
+</html>

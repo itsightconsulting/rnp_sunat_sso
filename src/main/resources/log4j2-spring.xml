@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="WARN" monitorInterval="30">
+    <Properties>
+        <Property name="LOG_PATH">
+            /fslogs/auth-sunatsol
+        </Property>
+        <Property name="LOG_PATTERN">
+            [%-5level] %d{yyyy-MM-dd HH:mm:ss.SS} ${hostName} --- [%15.15t] %-40.40c{1.} : %m%n%ex
+        </Property>
+    </Properties>
+    <Appenders>
+        <Console name="ConsoleAppender" target="SYSTEM_OUT" follow="true">
+            <PatternLayout pattern="${LOG_PATTERN}"/>
+        </Console>
+        <File name="AppFileAppender" fileName="${LOG_PATH}/auth-sunatsol.log">
+            <PatternLayout>
+                <pattern>
+                    [%-5level] %d{yyyy-MM-dd HH:mm:ss.SSS} [%t] %c{1} - %msg%n
+                </pattern>
+            </PatternLayout>
+        </File>
+        <File name="AppFileAppenderDebug" fileName="${LOG_PATH}/auth-sunatsol_warn.log">
+            <PatternLayout>
+                <pattern>
+                    [%-5level] %d{yyyy-MM-dd HH:mm:ss.SSS} [%t] %c{1} - %msg%n
+                </pattern>
+            </PatternLayout>
+        </File>
+        <File name="AppFileAppenderWarn" fileName="${LOG_PATH}/auth-sunatsol_warn.log">
+            <PatternLayout>
+                <pattern>
+                    [%-5level] %d{yyyy-MM-dd HH:mm:ss.SSS} [%t] %c{1} - %msg%n
+                </pattern>
+            </PatternLayout>
+        </File>
+    </Appenders>
+    <Loggers>
+        <!--<Logger name="pe.gob.sunat.tecnologia" level="debug" additivity="false">
+            <AppenderRef ref="AppFileAppenderDebug"/>
+            <AppenderRef ref="ConsoleAppender"/>
+        </Logger>-->
+        <Logger name="pe.gob.osce.rnp.seg.controller" level="info" additivity="false">
+            <AppenderRef ref="AppFileAppender"/>
+            <AppenderRef ref="ConsoleAppender"/>
+        </Logger>
+        <Logger name="pe.gob.osce.rnp.seg" level="warn" additivity="false">
+           <AppenderRef ref="AppFileAppenderWarn"/>
+        </Logger>
+        <Root level="info">
+            <AppenderRef ref="ConsoleAppender"/>
+        </Root>
+    </Loggers>
+</Configuration>

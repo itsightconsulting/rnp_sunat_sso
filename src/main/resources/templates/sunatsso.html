@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <title>RNP SSO</title>
+    <link rel="stylesheet" type="text/css" th:href="@{/webjars/bootstrap/3.3.2/css/bootstrap.min.css}"/>
+    <link rel="stylesheet" type="text/css" th:href="@{/css/font-awesome.min.css}"/>
+</head>
+<style>
+    body{
+        background: #000000c4 !important;;
+        color: white !important;
+    }
+
+    .fa-15x{
+        font-size: 1.5em !important;
+    }
+</style>
+<body>
+<h1 class="text-center">Por favor espere... <i class="fa fa-spinner fa-spin fa-15x"></i></h1>
+<div layout:fragment="content" th:remove="tag">
+    <div class="">
+        <div class="col-md-6 col-md-offset-3">
+            <input th:value="${itscur}" id="itscur" th:type="hidden"/>
+            <input th:value="${itsemitxam}" id="itsemitxam" th:type="hidden"/>
+            <input th:value="${itslru}" id="itslru" th:type="hidden"/>
+        </div>
+    </div>
+</div>
+<script th:inline="javascript">
+    (function(){
+        const itscur = document.querySelector('#itscur').value;
+        const itsemitxam = document.querySelector('#itsemitxam').value;
+        const itslru = document.querySelector('#itslru').value;
+        if(itscur != null && itsemitxam != null && itscur.length > 0 && itsemitxam.length > 0){
+          window.location.href = itslru+"/"+itscur+"/"+itsemitxam;
+        } else{
+          document.querySelector('body').innerHTML = "<h1 class='text-center'><i class='fa fa-exclamation-circle fa-fw fa-15x'></i>Petición no autorizada</h1>"
+        }
+    })();
+</script>
+</body>
+</html>
