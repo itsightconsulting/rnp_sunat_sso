@@ -13,5 +13,4 @@ public class RestDemoController {
     public @ResponseBody String getURL(HttpServletRequest request){
         return request.getRequestURL().toString();
     }
-
 }
