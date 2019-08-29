@@ -15,9 +15,6 @@ public class WebMvcConfiguration implements WebMvcConfigurer {
     @Value("${caching}")
     private boolean caching;
 
-    @Value("${spring.profiles.active}")
-    private String profileActive;
-
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
         if(caching)
