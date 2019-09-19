@@ -1,8 +1,5 @@
 package pe.gob.osce.rnp.seg.controller;
 
-import pe.gob.osce.rnp.seg.utils.Parseador;
-import pe.gob.osce.rnp.seg.model.Respuesta;
-import pe.gob.osce.rnp.seg.model.dto.TokenDTO;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,12 +11,16 @@ import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.AbstractController;
+import pe.gob.osce.rnp.seg.model.Respuesta;
+import pe.gob.osce.rnp.seg.model.dto.TokenDTO;
+import pe.gob.osce.rnp.seg.utils.Parseador;
 import pe.gob.sunat.tecnologia.menu.bean.UsuarioBean;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.nio.charset.StandardCharsets;
+import java.util.Base64;
 import java.util.Date;
 import java.util.Optional;
 
@@ -52,16 +53,16 @@ public class SunatSsoController extends AbstractController {
         LOGGER.info("SUNAT SSO CONTROLLER: handleRequestInternal*******************************");
         ModelAndView model = new ModelAndView(VIEW_FINAL_SUNAT_SSO);
         String rucAutenticado = obtenerRucDecodifcado();
-        if(rucAutenticado.equals("0"))
+        /*if(rucAutenticado.equals("0"))
            return model;
         String oauthToken = obtenerToken();
         if(oauthToken.equals("0"))
-           return model;
+           return model;*/
         //Borrando el objeto en session
         session.removeAttribute("usuarioBean");
 
         //Invocando el endpoint para registrar ruc que va actualizar su correo(Como método de validación y respaldo de seguridad)
-        registrarFlagPreviaActualizacionCorreo(rucAutenticado, httpServletRequest.getRemoteAddr(), oauthToken);
+        //registrarFlagPreviaActualizacionCorreo(rucAutenticado, httpServletRequest.getRemoteAddr(), oauthToken);
         //Encodificando
         Long time = new Date().getTime();
         String rucHash = Parseador.getEncodeHashLong32Id(SCHEMA_HASH, Long.valueOf(rucAutenticado));
@@ -69,6 +70,10 @@ public class SunatSsoController extends AbstractController {
         model.addObject("itscur", rucHash);
         model.addObject("itsemitxam", timeHash);
         model.addObject("itslru", angularEndpoint);
+        model.addObject("itspi", new String(
+                Base64.getEncoder().encode(
+                        httpServletRequest.getRemoteAddr().getBytes()),
+                StandardCharsets.UTF_8).replaceAll("\\=", ""));
         return model;
     }
 
@@ -111,6 +116,8 @@ public class SunatSsoController extends AbstractController {
             }
         }catch (HttpClientErrorException ex){
             LOGGER.info(ex.getLocalizedMessage());
+        } catch (Exception ex){
+            LOGGER.info(ex.getLocalizedMessage());
         }
         return "0";
     }
@@ -125,7 +132,7 @@ public class SunatSsoController extends AbstractController {
 
         MultiValueMap<String, String> map =
                 new LinkedMultiValueMap<>();
-        map.add("ipCliente",ipCliente);
+        map.add("ipCliente", ipCliente);
         map.add("ruc",ruc);
 
         HttpEntity<MultiValueMap<String, String>> entity =
@@ -141,6 +148,8 @@ public class SunatSsoController extends AbstractController {
                 }
             }
         }catch (HttpClientErrorException ex){
+            LOGGER.info(ex.getLocalizedMessage());
+        } catch (Exception ex){
             LOGGER.info(ex.getLocalizedMessage());
         }
         return "0";
