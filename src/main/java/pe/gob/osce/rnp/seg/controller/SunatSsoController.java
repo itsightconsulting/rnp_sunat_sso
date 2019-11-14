@@ -2,36 +2,30 @@ package pe.gob.osce.rnp.seg.controller;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
+import org.springframework.stereotype.Controller;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
-import org.springframework.web.servlet.ModelAndView;
-import org.springframework.web.servlet.mvc.AbstractController;
-import pe.gob.osce.rnp.seg.model.Respuesta;
 import pe.gob.osce.rnp.seg.model.dto.TokenDTO;
-import pe.gob.osce.rnp.seg.utils.Parseador;
-import pe.gob.sunat.tecnologia.menu.bean.UsuarioBean;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
-import java.nio.charset.StandardCharsets;
-import java.util.Base64;
-import java.util.Date;
 import java.util.Optional;
 
-public class SunatSsoController extends AbstractController {
+@Controller
+@RequestMapping("/externaluserauth")
+public class SunatSsoController {
 
     private static final String VIEW_FINAL_SUNAT_SSO = "sunatsso";
     private static final String SCHEMA_HASH = "its_sunat_sso";
+    private static final String OAUTH_GRANT_TYPE_FLOW = "authorization_code";
+    private static final String OAUTH_SCOPE_RNP = "https://eap.osce.gob.pe";
     public static final Logger LOGGER = LogManager.getLogger(SunatSsoController.class);
-
-    @Autowired
-    private HttpSession session;
 
     @Value("${oauth.client.id}")
     private String oauthClientId;
@@ -48,16 +42,66 @@ public class SunatSsoController extends AbstractController {
     @Value("${oauth.endpoint.post.sso.success}")
     private String endpointPostSsoSuccess;
 
+    @Value("${oauth.sunat.client.id}")
+    private String oauthSunatClientId;
+
+    @Value("${oauth.sunat.client.secret}")
+    private String oauthSunatSecret;
+
+    @Value("${oauth.sunat.endpoint.get.token}")
+    private String oauthSunatEndpointToken;
+
+    @GetMapping("")
+    public @ResponseBody String intercambiarTokenPostLoginEnOauthSunat(@RequestParam(value = "code") String codigoParaCanjear){
+        String endpointGetTokenFromSunat = String.format(oauthSunatEndpointToken, oauthSunatClientId);
+
+        RestTemplate restTemplate = new RestTemplate();
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+
+        MultiValueMap<String, String> map =
+                new LinkedMultiValueMap<>();
+        map.add("grant_type", OAUTH_GRANT_TYPE_FLOW);
+        map.add("code", codigoParaCanjear);
+        map.add("client_id", oauthSunatClientId);
+        map.add("client_secret", oauthSunatSecret);
+        map.add("scope", OAUTH_SCOPE_RNP);
+
+        HttpEntity<MultiValueMap<String, String>> entity =
+                new HttpEntity<>(map, headers);
+
+        try {
+            ResponseEntity<TokenDTO> secResponseEntity = restTemplate.exchange(endpointGetTokenFromSunat, HttpMethod.POST, entity, TokenDTO.class);
+            if(secResponseEntity.getStatusCode() == HttpStatus.OK){
+                LOGGER.info(secResponseEntity.getBody().toString());
+                Optional<TokenDTO> optTokenDto = Optional.ofNullable(secResponseEntity.getBody());
+                if(optTokenDto.isPresent()){
+                    return optTokenDto.get().getAccess_token();
+                }
+            }
+        }catch (HttpClientErrorException ex){
+            ex.printStackTrace();
+            LOGGER.info(ex.getLocalizedMessage());
+        } catch (Exception ex){
+            ex.printStackTrace();
+            LOGGER.info(ex.getLocalizedMessage());
+        }
+        return "Failed...check the console";
+    }
+
+
+    /*
+
     @Override
     protected ModelAndView handleRequestInternal(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) {
         LOGGER.info("SUNAT SSO CONTROLLER: handleRequestInternal*******************************");
         ModelAndView model = new ModelAndView(VIEW_FINAL_SUNAT_SSO);
         String rucAutenticado = obtenerRucDecodifcado();
-        /*if(rucAutenticado.equals("0"))
+        if(rucAutenticado.equals("0"))
            return model;
         String oauthToken = obtenerToken();
         if(oauthToken.equals("0"))
-           return model;*/
+           return model;
         //Borrando el objeto en session
         session.removeAttribute("usuarioBean");
 
@@ -153,5 +197,5 @@ public class SunatSsoController extends AbstractController {
             LOGGER.info(ex.getLocalizedMessage());
         }
         return "0";
-    }
+    }*/
 }
