@@ -35,10 +35,6 @@
         </File>
     </Appenders>
     <Loggers>
-        <Logger name="pe.gob.sunat.tecnologia" level="debug" additivity="false">
-            <AppenderRef ref="AppFileAppenderDebug"/>
-            <AppenderRef ref="ConsoleAppender"/>
-        </Logger>
         <Logger name="pe.gob.osce.rnp.seg.controller" level="info" additivity="false">
             <AppenderRef ref="AppFileAppender"/>
             <AppenderRef ref="ConsoleAppender"/>
