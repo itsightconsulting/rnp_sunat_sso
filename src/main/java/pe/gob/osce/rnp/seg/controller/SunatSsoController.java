@@ -31,20 +31,8 @@ public class SunatSsoController {
     private static final String OAUTH_SCOPE_RNP = "https://eap.osce.gob.pe";
     public static final Logger LOGGER = LogManager.getLogger(SunatSsoController.class);
 
-    @Value("${oauth.client.id}")
-    private String oauthClientId;
-
-    @Value("${oauth.client.secret}")
-    private String oauthSecret;
-
-    @Value("${oauth.endpoint.get.token}")
-    private String oauthEndpointToken;
-
     @Value("${angular.endpoint.bridge}")
     private String angularEndpoint;
-
-    @Value("${oauth.endpoint.post.sso.success}")
-    private String endpointPostSsoSuccess;
 
     @Value("${oauth.sunat.client.id}")
     private String oauthSunatClientId;
