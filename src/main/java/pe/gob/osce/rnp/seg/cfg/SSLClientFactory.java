@@ -13,13 +13,10 @@ import java.security.cert.X509Certificate;
 
 public abstract class SSLClientFactory {
 
-    private static boolean allowUntrusted = false;
-    private static final long LOGIN_TIMEOUT_SEC = 10;
     private static HttpClientBuilder closeableClientBuilder = null;
 
     public enum HttpClientType{
         HttpClient,
-        OkHttpClient
     }
 
 
@@ -30,7 +27,7 @@ public abstract class SSLClientFactory {
         SSLContext sslContext = SSLClientFactory.getSSlContext();
 
         if(null == sslContext){
-            return requestFactory;
+            return null;
         }
 
         switch (httpClientType) {
@@ -56,9 +53,6 @@ public abstract class SSLClientFactory {
 
 
     private static SSLContext getSSlContext(){
-
-
-
         final TrustManager[] trustAllCerts = new TrustManager[]{getTrustManager()};
 
         SSLContext sslContext = null;
